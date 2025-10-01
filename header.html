@@ -1,0 +1,45 @@
+<!-- HEADER (Fragment) -->
+<section id="site-header" dir="rtl" lang="ar">
+  <style>
+    #site-header {font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", Tahoma, Arial; }
+    .hdr-wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;
+      padding:14px 20px;background:#3bbabe;color:#fff;border-bottom:3px solid #ffd166}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff}
+    .logo{width:38px;height:38px;display:grid;place-items:center;background:#ffffff22;border:2px solid #fff;border-radius:12px}
+    .brand h1{font-size:20px;margin:0;letter-spacing:.5px}
+    .nav{display:flex;align-items:center;gap:14px}
+    .nav a{color:#fff;text-decoration:none;padding:8px 10px;border-radius:10px;transition:.2s}
+    .nav a:hover{background:#ffffff22}
+    .cta{background:#ffd166;color:#0f172a !important;font-weight:700}
+    @media (max-width:640px){ .nav{display:none} }
+  </style>
+
+  <div class="hdr-wrap">
+    <a class="brand" href="./">
+      <span class="logo" aria-hidden="true">
+        <!-- أيقونة قطرة/غسالة SVG -->
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2c3.5 4.6 6 8 6 11a6 6 0 1 1-12 0c0-3 2.5-6.4 6-11Z" stroke="#fff" stroke-width="1.6" fill="#ffffff33"/>
+          <circle cx="12" cy="13" r="2.8" fill="#fff"/>
+        </svg>
+      </span>
+      <h1>laundry MYX</h1>
+    </a>
+
+    <nav class="nav" aria-label="التنقل">
+      <a href="#services">خدماتنا</a>
+      <a href="#booking">حجز استلام</a>
+      <a href="#contact" class="cta">اتصل بنا</a>
+    </nav>
+  </div>
+
+  <script>
+    // يمكن إضافة أي سلوك لاحق للهيدر هنا
+    // مثال: تمييز الرابط النشط بناءً على الهاش
+    (function(){
+      const links = document.querySelectorAll('#site-header .nav a');
+      const setActive=()=>links.forEach(a=>a.classList.toggle('active', a.getAttribute('href')===location.hash));
+      window.addEventListener('hashchange', setActive); setActive();
+    })();
+  </script>
+</section>

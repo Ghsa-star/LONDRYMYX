@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>laundry MYX | مغسلة ملابس – جدة</title>
+  <meta name="description" content="مغسلة laundry MYX في جدة – حجز استلام المندوب، غسيل كيس كامل 50 ريال، غسيل بطانيات، تسليم خلال 24 ساعة." />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+  <style>
+    :root{
+      --primary:#0ea5a6; --accent:#ffd166; --bg:#f8fafc; --card:#ffffff; --muted:#475569;
+      --radius:16px; --shadow:0 10px 24px rgba(15,23,42,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,"Noto Sans Arabic",Arial;background:var(--bg);color:#0f172a}
+    a{color:var(--primary)}
+    .container{max-width:1100px;margin:auto;padding:18px}
+
+    /* هيرو */
+    .hero{
+      display:grid;
+      gap:16px;
+      grid-template-columns:1.2fr .8fr;
+      align-items:stretch; /* يخلي الأعمدة بنفس الطول */
+      margin:18px auto
+    }
+    .hero-card{
+      background:linear-gradient(135deg,#0ea5a6 0%,#13b1b2 40%,#0ea5a6 100%);
+      color:#fff;
+      border-radius:var(--radius);
+      padding:24px;
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      justify-content:center; /* يوسّط المحتوى */
+      height:100%; /* يتمدد مع طول العمود */
+    }
+    .hero h2{margin:0 0 8px;font-size:28px}
+    .badge{display:inline-flex;gap:8px;align-items:center;background:#ffffff20;border-radius:999px;padding:8px 12px;margin-top:10px}
+    .hero-illus img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+
+    /* الخدمات */
+    .section{margin:26px 0}
+    .grid{display:grid;gap:14px;grid-template-columns:repeat(2,1fr)}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+    .svc{display:flex;gap:14px;align-items:center}
+    .price{background:#0ea5a6;color:#fff;display:inline-block;padding:6px 10px;border-radius:12px;font-weight:700}
+
+    /* فورم */
+    form{display:grid;gap:12px}
+    input,button{font:inherit;padding:10px 12px;border:1px solid #e2e8f0;border-radius:12px}
+    input:focus{outline:none;border-color:#0ea5a6;box-shadow:0 0 0 3px #0ea5a622}
+    .btn{border:none;background:#0ea5a6;color:#fff;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
+    .map-box{width:600px;height:300px;border:1px solid #ddd;border-radius:12px;margin-top:6px}
+    .loc-btn{margin-top:8px;padding:8px 12px;border:none;background:#ffd166;color:#0f172a;font-weight:700;border-radius:10px;cursor:pointer}
+    .note-map{font-size:13px;color:#b91c1c;background:#fee2e2;padding:6px 10px;border-radius:8px;margin-top:6px;display:inline-block}
+    .error{display:none;margin-top:10px;padding:12px;border:1px solid #ef4444;background:#fee2e2;border-radius:12px;color:#991b1b}
+
+    /* نافذة منبثقة */
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:1000}
+    .modal-content{background:#fff;padding:24px;border-radius:16px;max-width:400px;text-align:center;box-shadow:var(--shadow)}
+    .modal-content h3{margin:0 0 12px;color:#16a34a}
+    .close-btn{margin-top:12px;padding:10px 16px;background:#0ea5a6;color:#fff;border:none;border-radius:10px;cursor:pointer}
+  </style>
+</head>
+<body>
+
+  <!-- الهيدر -->
+  <div id="header"></div>
+
+  <main class="container">
+    <!-- هيرو -->
+    <section class="hero">
+      <div class="hero-card">
+        <h2>laundry MYX – استلام من باب بيتك</h2>
+        <p>نخدم جدة – حي الحمدانية. نسلم غسيلك خلال <strong>24 ساعة</strong>.</p>
+        <div class="badge">اطلب الآن وسيصلك المندوب</div>
+      </div>
+      <div class="hero-illus">
+        <img src="images/londry.jpg" alt="Laundry MYX">
+      </div>
+    </section>
+
+    <!-- الخدمات -->
+    <section id="services" class="section">
+      <h3>خدماتنا</h3>
+      <div class="grid">
+        <article class="card"><div class="svc"><div><h4>غسيل كيس كامل</h4><span class="price">50 ريال</span></div></div></article>
+        <article class="card"><div class="svc"><div><h4>غسيل بطانيات</h4><p>السعر حسب العدد/الحجم</p></div></div></article>
+      </div>
+    </section>
+
+    <!-- الحجز -->
+    <section id="booking" class="section">
+      <h3>حجز استلام المندوب</h3>
+      <form id="orderForm" novalidate>
+        <div><label>الاسم الكامل</label><input id="custName" required placeholder="اكتب اسمك"/></div>
+        <div><label>رقم الجوال</label><input id="phone" type="tel" required pattern="^05[0-9]{8}$" placeholder="05XXXXXXXX"/></div>
+        <div><label>العنوان</label><input id="address" value="المملكة العربية السعودية - جدة - حي الحمدانية"/></div>
+        <div><label>وقت الاستلام</label><input id="pickup" type="datetime-local" required/></div>
+        <div>
+          <label>حدد موقعك</label>
+          <div id="map" class="map-box"></div>
+          <button type="button" id="locateBtn" class="loc-btn">📍 استخدم موقعي</button>
+          <input type="hidden" id="lat"><input type="hidden" id="lng">
+          <div class="note-map">🔔 الخدمة خاصة بحي الحمدانية – جدة فقط</div>
+        </div>
+        <div class="actions"><button class="btn" type="submit">إرسال الطلب</button></div>
+        <div class="error" id="errMsg">تحقق من الحقول المطلوبة.</div>
+      </form>
+    </section>
+
+    <!-- تواصل -->
+    <section id="contact" class="section">
+      <h3>التواصل السريع</h3>
+      <p>📍 جدة – حي الحمدانية | 📞 <a href="tel:0555005344">0555005344</a></p>
+    </section>
+  </main>
+
+  <!-- الفوتر -->
+  <div id="footer"></div>
+
+  <!-- نافذة منبثقة -->
+  <div id="successModal" class="modal">
+    <div class="modal-content">
+      <h3>✅ تم إرسال طلبك بنجاح</h3>
+      <p>سيتم التواصل معك من خلال مندوبيـنا.</p>
+      <button class="close-btn" onclick="document.getElementById('successModal').style.display='none'">إغلاق</button>
+    </div>
+  </div>
+
+  <!-- Leaflet -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    // تحميل الهيدر والفوتر
+    async function includeFragment(targetSelector, url){
+      const host = document.querySelector(targetSelector);
+      if(!host) return;
+      const res = await fetch(url, {cache: "no-store"});
+      host.innerHTML = await res.text();
+    }
+    includeFragment('#header','header.html');
+    includeFragment('#footer','footer.html');
+
+    // خريطة
+    const defaultPos=[21.707,39.190];
+    const map=L.map('map').setView(defaultPos,14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    const marker=L.marker(defaultPos,{draggable:true}).addTo(map);
+    function updateInputs(lat,lng){document.getElementById("lat").value=lat.toFixed(6);document.getElementById("lng").value=lng.toFixed(6);}
+    updateInputs(defaultPos[0],defaultPos[1]);
+    marker.on("dragend",()=>updateInputs(marker.getLatLng().lat,marker.getLatLng().lng));
+    map.on("click",e=>{marker.setLatLng(e.latlng);updateInputs(e.latlng.lat,e.latlng.lng)});
+    document.getElementById("locateBtn").onclick=function(){if(navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{const pos=[p.coords.latitude,p.coords.longitude];map.setView(pos,16);marker.setLatLng(pos);updateInputs(pos[0],pos[1]);});}};
+  </script>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBopfLBoVC5MNVZoushjkULIbpSSz6blXw",
+      authDomain: "laundry-myx.firebaseapp.com",
+      projectId: "laundry-myx",
+      storageBucket: "laundry-myx.firebasestorage.app",
+      messagingSenderId: "555843818317",
+      appId: "1:555843818317:web:f7c15109e178ef6a7b1d04",
+      measurementId: "G-3MH16DF42H"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // حفظ الطلب
+    document.getElementById("orderForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      document.getElementById("errMsg").style.display="none";
+
+      const name=document.getElementById("custName").value.trim();
+      const phone=document.getElementById("phone").value.trim();
+      const address=document.getElementById("address").value.trim();
+      const pickup=document.getElementById("pickup").value;
+      const lat=document.getElementById("lat").value;
+      const lng=document.getElementById("lng").value;
+
+      if(!name||!phone||!pickup){
+        document.getElementById("errMsg").style.display="block";return;
+      }
+
+      try {
+        await addDoc(collection(db, "orders"), {
+          name, phone, address, pickup, lat, lng,
+          createdAt: new Date().toISOString()
+        });
+
+        // عرض النافذة المنبثقة
+        document.getElementById("successModal").style.display="flex";
+        e.target.reset();
+      } catch(err) {
+        console.error("Firestore Error:", err);
+        document.getElementById("errMsg").style.display="block";
+      }
+    });
+  </script>
+</body>
+</html>

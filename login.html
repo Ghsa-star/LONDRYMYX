@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>تسجيل الدخول - Laundry MYX</title>
+  <style>
+    body {
+      margin:0;
+      font-family:"Noto Sans Arabic",system-ui;
+      background:linear-gradient(135deg,#2F80ED,#00BFA6);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+    }
+    .card {
+      background:#f9fafb;
+      padding:30px;
+      border-radius:16px;
+      box-shadow:0 8px 20px rgba(0,0,0,.15);
+      width:350px;
+      text-align:center;
+    }
+    h2 { margin-bottom:20px; color:#0f172a }
+    input {
+      width:100%;padding:12px;margin:8px 0;
+      border:1px solid #d1d5db;border-radius:8px;
+      font-size:15px;text-align:right;
+    }
+    button {
+      width:100%;padding:12px;
+      background:#0ea5a6;color:#fff;
+      border:none;border-radius:8px;
+      font-weight:bold;font-size:16px;
+      cursor:pointer;margin-top:10px;
+    }
+    button:hover{background:#0c8c8c}
+    .link {
+      display:block;margin-top:14px;font-size:.9rem;
+      color:#2563eb;cursor:pointer;text-decoration:underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>تسجيل الدخول</h2>
+    <input type="email" id="email" placeholder="البريد الإلكتروني" required />
+    <input type="password" id="password" placeholder="كلمة المرور" required />
+    <button id="loginBtn">دخول</button>
+    <span class="link" id="forgotBtn">نسيت كلمة المرور؟</span>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    // إعداد Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBopfLBoVC5MNVZoushjkULIbpSSz6blXw",
+      authDomain: "laundry-myx.firebaseapp.com",
+      projectId: "laundry-myx",
+      storageBucket: "laundry-myx.firebasestorage.app",
+      messagingSenderId: "555843818317",
+      appId: "1:555843818317:web:f7c15109e178ef6a7b1d04",
+      measurementId: "G-3MH16DF42H"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // تسجيل الدخول
+    document.getElementById("loginBtn").onclick = ()=>{
+      const email=document.getElementById("email").value;
+      const password=document.getElementById("password").value;
+      signInWithEmailAndPassword(auth,email,password)
+        .then(()=>window.location.href="dashboard.html")
+        .catch(err=>alert("خطأ: "+err.message));
+    };
+
+    // إعادة تعيين كلمة المرور
+    document.getElementById("forgotBtn").onclick = ()=>{
+      const email=document.getElementById("email").value;
+      if(!email){ alert("الرجاء إدخال البريد الإلكتروني أولاً"); return; }
+      sendPasswordResetEmail(auth,email)
+        .then(()=>alert("📧 تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك"))
+        .catch(err=>alert("خطأ: "+err.message));
+    };
+  </script>
+</body>
+</html>

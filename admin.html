@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>لوحة تحكم الأدمن</title>
+  <style>
+    body{font-family:system-ui,"Noto Sans Arabic";margin:20px;background:#f8fafc}
+    h2,h3{margin-top:0}
+    table{width:100%;border-collapse:collapse;margin-top:20px}
+    th,td{border:1px solid #ddd;padding:10px;text-align:right}
+    th{background:#0ea5a6;color:#fff}
+    button.action-btn{padding:6px 10px;border:none;border-radius:6px;cursor:pointer}
+    .delete-btn{background:#ef4444;color:#fff}
+    .cards{display:flex;gap:16px;flex-wrap:wrap;margin:20px 0}
+    .cards .card{flex:1;background:#fff;padding:16px;border-radius:12px;
+      box-shadow:0 4px 10px rgba(0,0,0,.05);text-align:center}
+    .cards h3{margin:0;font-size:16px;color:#0ea5a6}
+    .cards p{font-size:22px;font-weight:bold;margin-top:8px;color:#0f172a}
+  </style>
+</head>
+<body>
+  <h2>📋 الطلبات</h2>
+  <button id="logoutBtn">تسجيل خروج</button>
+
+  <!-- لوحة المعلومات -->
+  <div class="cards">
+    <div class="card">
+      <h3>إجمالي الطلبات</h3>
+      <p id="totalOrders">0</p>
+    </div>
+    <div class="card">
+      <h3>تم استلامها</h3>
+      <p id="receivedOrders">0</p>
+    </div>
+    <div class="card">
+      <h3>لم تُستلم بعد</h3>
+      <p id="pendingOrders">0</p>
+    </div>
+  </div>
+
+  <!-- جدول الطلبات -->
+  <table>
+    <thead>
+      <tr>
+        <th>الاسم</th>
+        <th>الجوال</th>
+        <th>العنوان</th>
+        <th>الاستلام</th>
+        <th>الموقع</th>
+        <th>وقت التسجيل</th>
+        <th>إجراءات</th>
+      </tr>
+    </thead>
+    <tbody id="ordersTable"></tbody>
+  </table>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBopfLBoVC5MNVZoushjkULIbpSSz6blXw",
+      authDomain: "laundry-myx.firebaseapp.com",
+      projectId: "laundry-myx",
+      storageBucket: "laundry-myx.firebasestorage.app",
+      messagingSenderId: "555843818317",
+      appId: "1:555843818317:web:f7c15109e178ef6a7b1d04",
+      measurementId: "G-3MH16DF42H"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // تحميل الطلبات
+    async function loadOrders() {
+      const q=query(collection(db,"orders"),orderBy("createdAt","desc"));
+      const snap=await getDocs(q);
+      const tbody=document.getElementById("ordersTable");
+
+      let totalOrders = 0;
+      let receivedOrders = 0;
+      let pendingOrders = 0;
+
+      tbody.innerHTML = ""; // تنظيف الجدول
+
+      snap.forEach(docSnap=>{
+        const d=docSnap.data();
+        const id=docSnap.id;
+        totalOrders++;
+
+        // إذا فيه وقت استلام اعتبرها مستلمة
+        if (d.pickup && d.pickup.trim() !== "") {
+          receivedOrders++;
+        } else {
+          pendingOrders++;
+        }
+
+        tbody.innerHTML+=`
+          <tr>
+            <td>${d.name}</td>
+            <td>${d.phone}</td>
+            <td>${d.address}</td>
+            <td>${d.pickup || "—"}</td>
+            <td><a target="_blank" href="https://maps.google.com/?q=${d.lat},${d.lng}">الموقع</a></td>
+            <td>${d.createdAt}</td>
+            <td>
+              <button class="action-btn delete-btn" onclick="deleteOrder('${id}')">حذف</button>
+            </td>
+          </tr>`;
+      });
+
+      // تحديث لوحة المعلومات
+      document.getElementById("totalOrders").textContent = totalOrders;
+      document.getElementById("receivedOrders").textContent = receivedOrders;
+      document.getElementById("pendingOrders").textContent = pendingOrders;
+    }
+
+    // دالة حذف الطلب
+    window.deleteOrder = async function(id) {
+      if(confirm("هل أنت متأكد من حذف هذا الطلب؟")) {
+        try {
+          await deleteDoc(doc(db, "orders", id));
+          alert("تم حذف الطلب بنجاح");
+          loadOrders(); // إعادة تحميل القائمة بعد الحذف
+        } catch(err) {
+          console.error("خطأ في الحذف:", err);
+          alert("حدث خطأ أثناء الحذف");
+        }
+      }
+    }
+
+    // تحقق من تسجيل الدخول
+    onAuthStateChanged(auth, async (user)=>{
+      if(user){
+        loadOrders();
+      } else {
+        window.location.href="login.html";
+      }
+    });
+
+    document.getElementById("logoutBtn").onclick=()=>signOut(auth);
+  </script>
+</body>
+</html>
