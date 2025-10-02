@@ -196,7 +196,14 @@
       const bags=document.getElementById("bagsCount").value;
       const blankets=document.getElementById("blanketsCount").value;
 
+      // تحقق من البيانات
       if(!name||!phone||!pickup||!serviceType){
+        document.getElementById("errMsg").style.display="block";return;
+      }
+      if(serviceType==="كيس" && (!bags || bags<=0)){
+        document.getElementById("errMsg").style.display="block";return;
+      }
+      if(serviceType==="بطانيات" && (!blankets || blankets<=0)){
         document.getElementById("errMsg").style.display="block";return;
       }
 
