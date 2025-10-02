@@ -116,7 +116,18 @@
         <div><label>الاسم الكامل</label><input id="custName" required placeholder="اكتب اسمك"/></div>
         <div><label>رقم الجوال</label><input id="phone" type="tel" required pattern="^05[0-9]{8}$" placeholder="05XXXXXXXX"/></div>
         <div><label>العنوان</label><input id="address" value="المملكة العربية السعودية - جدة - حي الحمدانية"/></div>
-        <div><label>وقت الاستلام</label><input id="pickup" type="datetime-local" required/></div>
+
+        <!-- وقت الاستلام -->
+        <div>
+          <label>وقت الاستلام</label>
+          <select id="pickupSlot" required></select>
+        </div>
+
+        <!-- وقت التوصيل -->
+        <div>
+          <label>وقت التوصيل</label>
+          <input id="deliverySlot" readonly />
+        </div>
 
         <div>
           <label>حدد موقعك</label>
@@ -174,6 +185,45 @@
     map.on("click",e=>{marker.setLatLng(e.latlng);updateInputs(e.latlng.lat,e.latlng.lng)});
     document.getElementById("locateBtn").onclick=function(){if(navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{const pos=[p.coords.latitude,p.coords.longitude];map.setView(pos,16);marker.setLatLng(pos);updateInputs(pos[0],pos[1]);});}};
 
+    // فترات الوقت
+    const slots = [
+      "8:00 ص - 10:00 ص",
+      "10:00 ص - 12:00 م",
+      "12:00 م - 2:00 م",
+      "2:00 م - 4:00 م",
+      "4:00 م - 6:00 م",
+      "6:00 م - 8:00 م",
+      "8:00 م - 10:00 م"
+    ];
+    const pickupSelect=document.getElementById("pickupSlot");
+    const deliverySlot=document.getElementById("deliverySlot");
+
+    function fillSlots(){
+      const now=new Date();
+      const currentHour=now.getHours();
+      pickupSelect.innerHTML="";
+      slots.forEach((slot,i)=>{
+        const opt=document.createElement("option");
+        opt.value=slot;
+        opt.textContent=slot;
+        // تعطيل الفترات الماضية
+        const slotStart=parseInt(slot.split(":")[0]);
+        if(slot.includes("م") && slotStart!==12) slotStart+=12;
+        if(slot.includes("ص") && slotStart===12) slotStart=0;
+        if(currentHour>=slotStart+2){ // انتهت الفترة
+          opt.disabled=true;
+        }
+        pickupSelect.appendChild(opt);
+      });
+    }
+    fillSlots();
+
+    pickupSelect.addEventListener("change",()=>{
+      if(pickupSelect.value){
+        deliverySlot.value=pickupSelect.value+" (اليوم التالي)";
+      }
+    });
+
     // إظهار القائمة حسب الخدمة
     document.querySelectorAll('input[name="serviceType"]').forEach(r=>{
       r.addEventListener("change",function(){
@@ -211,14 +261,14 @@
       const name=document.getElementById("custName").value.trim();
       const phone=document.getElementById("phone").value.trim();
       const address=document.getElementById("address").value.trim();
-      const pickup=document.getElementById("pickup").value;
+      const pickup=pickupSelect.value;
+      const delivery=deliverySlot.value;
       const lat=document.getElementById("lat").value;
       const lng=document.getElementById("lng").value;
       const serviceType=document.querySelector('input[name="serviceType"]:checked')?.value;
       const bags=document.getElementById("bagsCount").value;
       const blankets=document.getElementById("blanketsCount").value;
 
-      // تحقق
       if(!name||!phone||!pickup||!serviceType){
         document.getElementById("errMsg").style.display="block";return;
       }
@@ -231,7 +281,7 @@
 
       try {
         await addDoc(collection(db, "orders"), {
-          name, phone, address, pickup, lat, lng, serviceType,
+          name, phone, address, pickup, delivery, lat, lng, serviceType,
           bags: bags||null,
           blankets: blankets||null,
           createdAt: new Date().toISOString()
