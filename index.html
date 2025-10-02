@@ -18,64 +18,25 @@
     body{margin:0;font-family:system-ui,"Noto Sans Arabic",Arial;background:var(--bg);color:#0f172a}
     a{color:var(--primary)}
     .container{max-width:1100px;margin:auto;padding:18px}
-
-    /* هيرو */
-    .hero{
-      display:grid;
-      gap:16px;
-      grid-template-columns:1.2fr .8fr;
-      align-items:stretch;
-      margin:18px auto
-    }
-    .hero-card{
-      background:linear-gradient(135deg,#0ea5a6 0%,#13b1b2 40%,#0ea5a6 100%);
-      color:#fff;
-      border-radius:var(--radius);
-      padding:24px;
-      box-shadow:var(--shadow);
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      height:100%;
-    }
+    .hero{display:grid;gap:16px;grid-template-columns:1.2fr .8fr;align-items:stretch;margin:18px auto}
+    .hero-card{background:linear-gradient(135deg,#0ea5a6 0%,#13b1b2 40%,#0ea5a6 100%);color:#fff;border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);display:flex;flex-direction:column;justify-content:center;height:100%}
     .hero h2{margin:0 0 8px;font-size:28px}
     .badge{display:inline-flex;gap:8px;align-items:center;background:#ffffff20;border-radius:999px;padding:8px 12px;margin-top:10px}
     .hero-illus img{width:100%;height:100%;object-fit:cover;border-radius:12px}
-
-    /* الخدمات */
     .section{margin:26px 0}
     .grid{display:grid;gap:14px;grid-template-columns:repeat(2,1fr)}
     .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
     .svc{display:flex;gap:14px;align-items:center}
     .price{background:#0ea5a6;color:#fff;display:inline-block;padding:6px 10px;border-radius:12px;font-weight:700}
-
-    /* فورم */
     form{display:grid;gap:12px}
     input,button{font:inherit;padding:10px 12px;border:1px solid #e2e8f0;border-radius:12px}
     input:focus{outline:none;border-color:#0ea5a6;box-shadow:0 0 0 3px #0ea5a622}
     .btn{border:none;background:#0ea5a6;color:#fff;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
-    
-    /* الخريطة */
-    .map-box {
-      width: 100%;
-      max-width: 100%;
-      height: 250px; /* افتراضي */
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      margin-top: 6px;
-    }
-    /* للشاشات الصغيرة */
-    @media(max-width: 768px) {
-      .map-box {
-        height: 180px; /* أصغر على الجوال */
-      }
-    }
-
+    .map-box {width: 100%;max-width: 100%;height: 250px;border: 1px solid #ddd;border-radius: 12px;margin-top: 6px;}
+    @media(max-width: 768px) {.map-box {height: 180px;}}
     .loc-btn{margin-top:8px;padding:8px 12px;border:none;background:#ffd166;color:#0f172a;font-weight:700;border-radius:10px;cursor:pointer}
     .note-map{font-size:13px;color:#b91c1c;background:#fee2e2;padding:6px 10px;border-radius:8px;margin-top:6px;display:inline-block}
     .error{display:none;margin-top:10px;padding:12px;border:1px solid #ef4444;background:#fee2e2;border-radius:12px;color:#991b1b}
-
-    /* نافذة منبثقة */
     .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:1000}
     .modal-content{background:#fff;padding:24px;border-radius:16px;max-width:400px;text-align:center;box-shadow:var(--shadow)}
     .modal-content h3{margin:0 0 12px;color:#16a34a}
@@ -117,6 +78,24 @@
         <div><label>رقم الجوال</label><input id="phone" type="tel" required pattern="^05[0-9]{8}$" placeholder="05XXXXXXXX"/></div>
         <div><label>العنوان</label><input id="address" value="المملكة العربية السعودية - جدة - حي الحمدانية"/></div>
         <div><label>وقت الاستلام</label><input id="pickup" type="datetime-local" required/></div>
+
+        <!-- الخدمة -->
+        <div>
+          <label>الخدمة</label>
+          <div>
+            <label><input type="radio" name="serviceType" value="كيس"> غسيل كيس كامل</label>
+            <div id="bagsInput" style="display:none;margin-top:6px;">
+              <input type="number" id="bagsCount" min="1" placeholder="عدد الأكياس"/>
+            </div>
+          </div>
+          <div style="margin-top:10px;">
+            <label><input type="radio" name="serviceType" value="بطانيات"> غسيل بطانيات</label>
+            <div id="blanketsInput" style="display:none;margin-top:6px;">
+              <input type="number" id="blanketsCount" min="1" placeholder="عدد البطانيات"/>
+            </div>
+          </div>
+        </div>
+
         <div>
           <label>حدد موقعك</label>
           <div id="map" class="map-box"></div>
@@ -172,6 +151,16 @@
     marker.on("dragend",()=>updateInputs(marker.getLatLng().lat,marker.getLatLng().lng));
     map.on("click",e=>{marker.setLatLng(e.latlng);updateInputs(e.latlng.lat,e.latlng.lng)});
     document.getElementById("locateBtn").onclick=function(){if(navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{const pos=[p.coords.latitude,p.coords.longitude];map.setView(pos,16);marker.setLatLng(pos);updateInputs(pos[0],pos[1]);});}};
+
+    // إظهار مربع العدد عند اختيار الخدمة
+    document.querySelectorAll('input[name="serviceType"]').forEach(r=>{
+      r.addEventListener("change",function(){
+        document.getElementById("bagsInput").style.display="none";
+        document.getElementById("blanketsInput").style.display="none";
+        if(this.value==="كيس"){document.getElementById("bagsInput").style.display="block";}
+        if(this.value==="بطانيات"){document.getElementById("blanketsInput").style.display="block";}
+      });
+    });
   </script>
 
   <!-- Firebase -->
@@ -203,14 +192,19 @@
       const pickup=document.getElementById("pickup").value;
       const lat=document.getElementById("lat").value;
       const lng=document.getElementById("lng").value;
+      const serviceType=document.querySelector('input[name="serviceType"]:checked')?.value;
+      const bags=document.getElementById("bagsCount").value;
+      const blankets=document.getElementById("blanketsCount").value;
 
-      if(!name||!phone||!pickup){
+      if(!name||!phone||!pickup||!serviceType){
         document.getElementById("errMsg").style.display="block";return;
       }
 
       try {
         await addDoc(collection(db, "orders"), {
-          name, phone, address, pickup, lat, lng,
+          name, phone, address, pickup, lat, lng, serviceType,
+          bags: bags||null,
+          blankets: blankets||null,
           createdAt: new Date().toISOString()
         });
 
