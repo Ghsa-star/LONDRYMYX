@@ -26,11 +26,11 @@
     .section{margin:26px 0}
     .grid{display:grid;gap:14px;grid-template-columns:repeat(2,1fr)}
     .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
-    .svc{display:flex;gap:14px;align-items:center}
+    .svc{display:flex;gap:14px;align-items:center;justify-content:space-between}
     .price{background:#0ea5a6;color:#fff;display:inline-block;padding:6px 10px;border-radius:12px;font-weight:700}
     form{display:grid;gap:12px}
-    input,button{font:inherit;padding:10px 12px;border:1px solid #e2e8f0;border-radius:12px}
-    input:focus{outline:none;border-color:#0ea5a6;box-shadow:0 0 0 3px #0ea5a622}
+    input,select,button{font:inherit;padding:10px 12px;border:1px solid #e2e8f0;border-radius:12px}
+    input:focus,select:focus{outline:none;border-color:#0ea5a6;box-shadow:0 0 0 3px #0ea5a622}
     .btn{border:none;background:#0ea5a6;color:#fff;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
     .map-box {width: 100%;max-width: 100%;height: 250px;border: 1px solid #ddd;border-radius: 12px;margin-top: 6px;}
     @media(max-width: 768px) {.map-box {height: 180px;}}
@@ -61,12 +61,51 @@
       </div>
     </section>
 
-    <!-- الخدمات -->
+    <!-- الخدمات + الاختيار -->
     <section id="services" class="section">
       <h3>خدماتنا</h3>
       <div class="grid">
-        <article class="card"><div class="svc"><div><h4>غسيل كيس كامل</h4><span class="price">50 ريال</span></div></div></article>
-        <article class="card"><div class="svc"><div><h4>غسيل بطانيات</h4><p>السعر حسب العدد/الحجم</p></div></div></article>
+        <article class="card">
+          <div class="svc">
+            <div>
+              <h4>غسيل كيس كامل</h4>
+              <span class="price">50 ريال</span>
+            </div>
+            <label><input type="radio" name="serviceType" value="كيس"> اختر</label>
+          </div>
+          <div id="bagsInput" style="display:none;margin-top:8px;">
+            <label>عدد الأكياس</label>
+            <select id="bagsCount">
+              <option value="">-- اختر --</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="svc">
+            <div>
+              <h4>غسيل بطانيات</h4>
+              <p>السعر حسب العدد/الحجم</p>
+            </div>
+            <label><input type="radio" name="serviceType" value="بطانيات"> اختر</label>
+          </div>
+          <div id="blanketsInput" style="display:none;margin-top:8px;">
+            <label>عدد البطانيات</label>
+            <select id="blanketsCount">
+              <option value="">-- اختر --</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -78,23 +117,6 @@
         <div><label>رقم الجوال</label><input id="phone" type="tel" required pattern="^05[0-9]{8}$" placeholder="05XXXXXXXX"/></div>
         <div><label>العنوان</label><input id="address" value="المملكة العربية السعودية - جدة - حي الحمدانية"/></div>
         <div><label>وقت الاستلام</label><input id="pickup" type="datetime-local" required/></div>
-
-        <!-- الخدمة -->
-        <div>
-          <label>الخدمة</label>
-          <div>
-            <label><input type="radio" name="serviceType" value="كيس"> غسيل كيس كامل</label>
-            <div id="bagsInput" style="display:none;margin-top:6px;">
-              <input type="number" id="bagsCount" min="1" placeholder="عدد الأكياس"/>
-            </div>
-          </div>
-          <div style="margin-top:10px;">
-            <label><input type="radio" name="serviceType" value="بطانيات"> غسيل بطانيات</label>
-            <div id="blanketsInput" style="display:none;margin-top:6px;">
-              <input type="number" id="blanketsCount" min="1" placeholder="عدد البطانيات"/>
-            </div>
-          </div>
-        </div>
 
         <div>
           <label>حدد موقعك</label>
@@ -152,7 +174,7 @@
     map.on("click",e=>{marker.setLatLng(e.latlng);updateInputs(e.latlng.lat,e.latlng.lng)});
     document.getElementById("locateBtn").onclick=function(){if(navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{const pos=[p.coords.latitude,p.coords.longitude];map.setView(pos,16);marker.setLatLng(pos);updateInputs(pos[0],pos[1]);});}};
 
-    // إظهار مربع العدد عند اختيار الخدمة
+    // إظهار القائمة حسب الخدمة
     document.querySelectorAll('input[name="serviceType"]').forEach(r=>{
       r.addEventListener("change",function(){
         document.getElementById("bagsInput").style.display="none";
@@ -196,14 +218,14 @@
       const bags=document.getElementById("bagsCount").value;
       const blankets=document.getElementById("blanketsCount").value;
 
-      // تحقق من البيانات
+      // تحقق
       if(!name||!phone||!pickup||!serviceType){
         document.getElementById("errMsg").style.display="block";return;
       }
-      if(serviceType==="كيس" && (!bags || bags<=0)){
+      if(serviceType==="كيس" && !bags){
         document.getElementById("errMsg").style.display="block";return;
       }
-      if(serviceType==="بطانيات" && (!blankets || blankets<=0)){
+      if(serviceType==="بطانيات" && !blankets){
         document.getElementById("errMsg").style.display="block";return;
       }
 
@@ -215,7 +237,6 @@
           createdAt: new Date().toISOString()
         });
 
-        // عرض النافذة المنبثقة
         document.getElementById("successModal").style.display="flex";
         e.target.reset();
       } catch(err) {
