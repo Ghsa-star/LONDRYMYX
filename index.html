@@ -67,11 +67,11 @@
       <div class="grid">
         <article class="card">
           <div class="svc">
+            <label><input type="radio" name="serviceType" value="كيس"> اختر</label>
             <div>
               <h4>غسيل كيس كامل</h4>
               <span class="price">50 ريال</span>
             </div>
-            <label><input type="radio" name="serviceType" value="كيس"> اختر</label>
           </div>
           <div id="bagsInput" style="display:none;margin-top:8px;">
             <label>عدد الأكياس</label>
@@ -88,11 +88,11 @@
 
         <article class="card">
           <div class="svc">
+            <label><input type="radio" name="serviceType" value="بطانيات"> اختر</label>
             <div>
               <h4>غسيل بطانيات</h4>
               <p>السعر حسب العدد/الحجم</p>
             </div>
-            <label><input type="radio" name="serviceType" value="بطانيات"> اختر</label>
           </div>
           <div id="blanketsInput" style="display:none;margin-top:8px;">
             <label>عدد البطانيات</label>
@@ -187,34 +187,37 @@
 
     // فترات الوقت
     const slots = [
-      "8:00 ص - 10:00 ص",
-      "10:00 ص - 12:00 م",
-      "12:00 م - 2:00 م",
-      "2:00 م - 4:00 م",
-      "4:00 م - 6:00 م",
-      "6:00 م - 8:00 م",
-      "8:00 م - 10:00 م"
+      {start:8,end:10,label:"8:00 ص - 10:00 ص"},
+      {start:10,end:12,label:"10:00 ص - 12:00 م"},
+      {start:12,end:14,label:"12:00 م - 2:00 م"},
+      {start:14,end:16,label:"2:00 م - 4:00 م"},
+      {start:16,end:18,label:"4:00 م - 6:00 م"},
+      {start:18,end:20,label:"6:00 م - 8:00 م"},
+      {start:20,end:22,label:"8:00 م - 10:00 م"}
     ];
     const pickupSelect=document.getElementById("pickupSlot");
     const deliverySlot=document.getElementById("deliverySlot");
 
     function fillSlots(){
       const now=new Date();
-      const currentHour=now.getHours();
+      const hour=now.getHours();
       pickupSelect.innerHTML="";
-      slots.forEach((slot,i)=>{
+      slots.forEach(s=>{
         const opt=document.createElement("option");
-        opt.value=slot;
-        opt.textContent=slot;
-        // تعطيل الفترات الماضية
-        const slotStart=parseInt(slot.split(":")[0]);
-        if(slot.includes("م") && slotStart!==12) slotStart+=12;
-        if(slot.includes("ص") && slotStart===12) slotStart=0;
-        if(currentHour>=slotStart+2){ // انتهت الفترة
+        opt.value=s.label;
+        opt.textContent=s.label;
+        if(hour>=s.end){ // انتهت الفترة
           opt.disabled=true;
+          opt.textContent+=" (انتهت)";
         }
         pickupSelect.appendChild(opt);
       });
+      // اختر أول فترة متاحة
+      const firstAvailable=Array.from(pickupSelect.options).find(o=>!o.disabled);
+      if(firstAvailable){
+        pickupSelect.value=firstAvailable.value;
+        deliverySlot.value=firstAvailable.value+" (اليوم التالي)";
+      }
     }
     fillSlots();
 
