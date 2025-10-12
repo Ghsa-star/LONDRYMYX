@@ -4,9 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>مغاسل لمسة لمعان | مغسلة ملابس – جدة</title>
-  <meta name="description" content="مغسلة مغاسل لمسة لمعان في جدة – حجز استلام المندوب، غسيل كيس كامل 50 ريال، غسيل بطانيات، تسليم خلال 24 ساعة." />
+  <meta name="description" content="مغسلة مغاسل لمسة لمعان في جدة – حجز استلام المندوب، غسيل كيس كامل 50 ريال، غسيل بطانيات، تسليم خلال 24 ساعة.">
 
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
   <style>
@@ -15,7 +14,7 @@
       --radius:16px; --shadow:0 10px 24px rgba(15,23,42,.08);
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,"Noto Sans Arabic",Arial;background:var(--bg);color:#0f172a}
+    body{margin:0;font-family:"Noto Sans Arabic",system-ui,Arial;background:var(--bg);color:#0f172a;direction:rtl;text-align:right}
     a{color:var(--primary)}
     .container{max-width:1100px;margin:auto;padding:18px}
     .hero{display:grid;gap:16px;grid-template-columns:1.2fr .8fr;align-items:stretch;margin:18px auto}
@@ -24,110 +23,85 @@
     .badge{display:inline-flex;gap:8px;align-items:center;background:#ffffff20;border-radius:999px;padding:8px 12px;margin-top:10px}
     .hero-illus img{width:100%;height:100%;object-fit:cover;border-radius:12px}
     .section{margin:26px 0}
-    .grid{display:grid;gap:14px;grid-template-columns:repeat(2,1fr)}
+    .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
     .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
     .svc{display:flex;gap:14px;align-items:center;justify-content:space-between}
+    .svc img{width:70px;height:70px;border-radius:12px;object-fit:cover}
     .price{background:#0ea5a6;color:#fff;display:inline-block;padding:6px 10px;border-radius:12px;font-weight:700}
     form{display:grid;gap:12px}
     input,select,button{font:inherit;padding:10px 12px;border:1px solid #e2e8f0;border-radius:12px}
     input:focus,select:focus{outline:none;border-color:#0ea5a6;box-shadow:0 0 0 3px #0ea5a622}
     .btn{border:none;background:#0ea5a6;color:#fff;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
-    .map-box {width: 100%;max-width: 100%;height: 250px;border: 1px solid #ddd;border-radius: 12px;margin-top: 6px;}
-    @media(max-width: 768px) {.map-box {height: 180px;}}
+    .map-box{width:100%;height:250px;border:1px solid #ddd;border-radius:12px;margin-top:6px;}
     .loc-btn{margin-top:8px;padding:8px 12px;border:none;background:#ffd166;color:#0f172a;font-weight:700;border-radius:10px;cursor:pointer}
     .note-map{font-size:13px;color:#b91c1c;background:#fee2e2;padding:6px 10px;border-radius:8px;margin-top:6px;display:inline-block}
     .error{display:none;margin-top:10px;padding:12px;border:1px solid #ef4444;background:#fee2e2;border-radius:12px;color:#991b1b}
-    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:1000}
-    .modal-content{background:#fff;padding:24px;border-radius:16px;max-width:400px;text-align:center;box-shadow:var(--shadow)}
-    .modal-content h3{margin:0 0 12px;color:#16a34a}
-    .close-btn{margin-top:12px;padding:10px 16px;background:#0ea5a6;color:#fff;border:none;border-radius:10px;cursor:pointer}
+    .time-options{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .time-option{padding:8px 12px;border:1px solid #ccc;border-radius:8px;cursor:pointer}
+    .time-option.selected{background:#0ea5a6;color:#fff;border-color:#0ea5a6}
+    .time-option.disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed}
+    #deliverySlot{width:100%;max-width:350px;}
   </style>
 </head>
 <body>
 
-  <!-- الهيدر -->
   <div id="header"></div>
 
   <main class="container">
-    <!-- هيرو -->
     <section class="hero">
       <div class="hero-card">
-        <h2>مغاسل لمسة لمعان – نجيك الى باب البيت </h2>
+        <h2>نجيك إلى باب البيت</h2>
         <p>نخدم جدة – حي الحمدانية. استلام وتوصيل الملابس خلال <strong>24 ساعة</strong>.</p>
         <div class="badge">اطلب الآن وسيصلك المندوب</div>
       </div>
       <div class="hero-illus">
-        <img src="images/londry.jpg" alt="مغاسل لمسة لمعان">
+        <img src="images/londry.jpg" alt="مغسلة لمسة لمعان">
       </div>
     </section>
 
-    <!-- الخدمات + الاختيار -->
     <section id="services" class="section">
       <h3>خدماتنا</h3>
       <div class="grid">
         <article class="card">
           <div class="svc">
-            <label><input type="radio" name="serviceType" value="كيس"> اختر</label>
             <div>
               <h4>غسيل كيس كامل</h4>
               <span class="price">50 ريال</span>
             </div>
+            <img src="images/bag.png" alt="كيس غسيل">
           </div>
+          <label><input type="radio" name="serviceType" value="كيس"> اختر الخدمة</label>
           <div id="bagsInput" style="display:none;margin-top:8px;">
             <label>عدد الأكياس</label>
             <select id="bagsCount">
               <option value="">-- اختر --</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
+              <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
             </select>
           </div>
         </article>
 
-        <article class="card">
+        <article class="card" style="opacity:0.6;pointer-events:none;">
           <div class="svc">
-            <label><input type="radio" name="serviceType" value="بطانيات"> اختر</label>
             <div>
               <h4>غسيل بطانيات</h4>
-              <p>السعر حسب العدد/الحجم</p>
+              <p>الخدمة غير متاحة حاليًا</p>
             </div>
-          </div>
-          <div id="blanketsInput" style="display:none;margin-top:8px;">
-            <label>عدد البطانيات</label>
-            <select id="blanketsCount">
-              <option value="">-- اختر --</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
+            <img src="images/bat.png" alt="بطانية">
           </div>
         </article>
       </div>
     </section>
 
-    <!-- الحجز -->
     <section id="booking" class="section">
-      <h3>حجز استلام المندوب</h3>
+      <h3>إرسال طلبك وطلب المندوب</h3>
       <form id="orderForm" novalidate>
         <div><label>الاسم الكامل</label><input id="custName" required placeholder="اكتب اسمك"/></div>
         <div><label>رقم الجوال</label><input id="phone" type="tel" required pattern="^05[0-9]{8}$" placeholder="05XXXXXXXX"/></div>
-        <div><label>العنوان</label><input id="address" value="المملكة العربية السعودية - جدة - حي الحمدانية"/></div>
+        <div><label>العنوان</label><input id="address" value="جدة - الحمدانية" readonly style="background:#f1f5f9;color:#475569"/></div>
 
-        <!-- وقت الاستلام -->
-        <div>
-          <label>وقت الاستلام</label>
-          <select id="pickupSlot" required></select>
-        </div>
-
-        <!-- وقت التوصيل -->
-        <div>
-          <label>وقت التوصيل</label>
-          <input id="deliverySlot" readonly />
-        </div>
+        <div><label>تاريخ الاستلام</label><select id="pickupDate" required></select></div>
+        <div><label>وقت الاستلام</label><div class="time-options" id="timeOptions"></div></div>
+        <div><label>وقت التوصيل</label><input id="deliverySlot" readonly /></div>
 
         <div>
           <label>حدد موقعك</label>
@@ -136,57 +110,90 @@
           <input type="hidden" id="lat"><input type="hidden" id="lng">
           <div class="note-map">🔔 الخدمة خاصة بحي الحمدانية – جدة فقط</div>
         </div>
+
         <div class="actions"><button class="btn" type="submit">إرسال الطلب</button></div>
         <div class="error" id="errMsg">تحقق من الحقول المطلوبة.</div>
       </form>
     </section>
 
-    <!-- تواصل -->
     <section id="contact" class="section">
       <h3>التواصل السريع</h3>
       <p>📍 جدة – حي الحمدانية | 📞 <a href="tel:0555005344">0555005344</a></p>
     </section>
   </main>
 
-  <!-- الفوتر -->
   <div id="footer"></div>
 
-  <!-- نافذة منبثقة -->
-  <div id="successModal" class="modal">
-    <div class="modal-content">
-      <h3>✅ تم إرسال طلبك بنجاح</h3>
-      <p>سيتم التواصل معك من خلال مندوبيـنا.</p>
-      <button class="close-btn" onclick="document.getElementById('successModal').style.display='none'">إغلاق</button>
-    </div>
-  </div>
-
-  <!-- Leaflet -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <script>
-    // تحميل الهيدر والفوتر
-    async function includeFragment(targetSelector, url){
-      const host = document.querySelector(targetSelector);
-      if(!host) return;
-      const res = await fetch(url, {cache: "no-store"});
-      host.innerHTML = await res.text();
+    async function includeFragment(targetSelector,url){
+      const host=document.querySelector(targetSelector);
+      if(!host)return;
+      const res=await fetch(url,{cache:"no-store"});
+      host.innerHTML=await res.text();
     }
     includeFragment('#header','header.html');
     includeFragment('#footer','footer.html');
 
-    // خريطة
+    // إعداد الخريطة والتحقق من الحمدانية
     const defaultPos=[21.707,39.190];
     const map=L.map('map').setView(defaultPos,14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
     const marker=L.marker(defaultPos,{draggable:true}).addTo(map);
+
     function updateInputs(lat,lng){document.getElementById("lat").value=lat.toFixed(6);document.getElementById("lng").value=lng.toFixed(6);}
     updateInputs(defaultPos[0],defaultPos[1]);
-    marker.on("dragend",()=>updateInputs(marker.getLatLng().lat,marker.getLatLng().lng));
-    map.on("click",e=>{marker.setLatLng(e.latlng);updateInputs(e.latlng.lat,e.latlng.lng)});
-    document.getElementById("locateBtn").onclick=function(){if(navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{const pos=[p.coords.latitude,p.coords.longitude];map.setView(pos,16);marker.setLatLng(pos);updateInputs(pos[0],pos[1]);});}};
+
+    // حدود حي الحمدانية
+    const areaBounds={minLat:21.690,maxLat:21.725,minLng:39.175,maxLng:39.205};
+    function isInHamdania(lat,lng){return(lat>areaBounds.minLat&&lat<areaBounds.maxLat&&lng>areaBounds.minLng&&lng<areaBounds.maxLng);}
+
+    // التفاعل مع الخريطة
+    map.on("click",async(e)=>{
+      const{lat,lng}=e.latlng;
+      if(!isInHamdania(lat,lng)){alert("❌ الموقع خارج نطاق حي الحمدانية، الرجاء اختيار موقع داخل الحي.");return;}
+      marker.setLatLng(e.latlng);
+      updateInputs(lat,lng);
+      try{
+        const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,{headers:{"Accept-Language":"ar"}});
+        const data=await res.json();
+        const area=data.address?.suburb||data.address?.neighbourhood||data.address?.city_district||"حي غير معروف";
+        alert("📍 تم تحديد موقعك داخل: "+area);
+      }catch{alert("📍 تم تحديد الموقع داخل الحي بنجاح.");}
+    });
+
+    document.getElementById("locateBtn").onclick=function(){
+      if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(p=>{
+          const pos=[p.coords.latitude,p.coords.longitude];
+          const[lat,lng]=pos;
+          if(!isInHamdania(lat,lng)){alert("❌ موقعك الحالي خارج نطاق حي الحمدانية.");return;}
+          map.setView(pos,16);
+          marker.setLatLng(pos);
+          updateInputs(lat,lng);
+          alert("📍 تم تحديد موقعك داخل الحمدانية بنجاح.");
+        });
+      }else{
+        alert("⚠️ المتصفح لا يدعم تحديد الموقع الجغرافي.");
+      }
+    };
+
+    // قائمة الأيام (اليوم، غداً، بعد غد)
+    const pickupSelect=document.getElementById("pickupDate");
+    const today=new Date();
+    const days=["اليوم","غداً"];
+    for(let i=0;i<3;i++){
+      const d=new Date();d.setDate(today.getDate()+i);
+      const label=i<2?`${days[i]} - ${d.toLocaleDateString("en-CA")}`:`${d.toLocaleDateString("ar-SA",{weekday:"long"})} - ${d.toLocaleDateString("en-CA")}`;
+      const opt=document.createElement("option");
+      opt.value=d.toISOString().split("T")[0];
+      opt.textContent=label;
+      pickupSelect.appendChild(opt);
+    }
 
     // فترات الوقت
-    const slots = [
+    const slots=[
       {start:8,end:10,label:"8:00 ص - 10:00 ص"},
       {start:10,end:12,label:"10:00 ص - 12:00 م"},
       {start:12,end:14,label:"12:00 م - 2:00 م"},
@@ -195,105 +202,70 @@
       {start:18,end:20,label:"6:00 م - 8:00 م"},
       {start:20,end:22,label:"8:00 م - 10:00 م"}
     ];
-    const pickupSelect=document.getElementById("pickupSlot");
+
+    const timeOptions=document.getElementById("timeOptions");
     const deliverySlot=document.getElementById("deliverySlot");
 
     function fillSlots(){
       const now=new Date();
-      const hour=now.getHours();
-      pickupSelect.innerHTML="";
+      const selectedDate=new Date(pickupSelect.value);
+      const isToday=selectedDate.toDateString()===now.toDateString();
+      timeOptions.innerHTML="";
+      const nowMinutes=now.getHours()*60+now.getMinutes();
+
       slots.forEach(s=>{
-        const opt=document.createElement("option");
-        opt.value=s.label;
-        opt.textContent=s.label;
-        if(hour>=s.end){ // انتهت الفترة
-          opt.disabled=true;
-          opt.textContent+=" (انتهت)";
-        }
-        pickupSelect.appendChild(opt);
+        const btn=document.createElement("button");
+        btn.type="button";
+        btn.textContent=s.label;
+        btn.className="time-option";
+        const startMinutes=s.start*60;
+        if(isToday&&nowMinutes>=startMinutes){btn.classList.add("disabled");btn.disabled=true;}
+        btn.onclick=function(){
+          if(btn.disabled)return;
+          document.querySelectorAll(".time-option").forEach(o=>o.classList.remove("selected"));
+          btn.classList.add("selected");
+          deliverySlot.value=s.label+" (اليوم التالي)";
+        };
+        timeOptions.appendChild(btn);
       });
-      // اختر أول فترة متاحة
-      const firstAvailable=Array.from(pickupSelect.options).find(o=>!o.disabled);
-      if(firstAvailable){
-        pickupSelect.value=firstAvailable.value;
-        deliverySlot.value=firstAvailable.value+" (اليوم التالي)";
-      }
     }
     fillSlots();
+    pickupSelect.addEventListener("change",fillSlots);
 
-    pickupSelect.addEventListener("change",()=>{
-      if(pickupSelect.value){
-        deliverySlot.value=pickupSelect.value+" (اليوم التالي)";
-      }
-    });
-
-    // إظهار القائمة حسب الخدمة
+    // اختيار الخدمة
     document.querySelectorAll('input[name="serviceType"]').forEach(r=>{
-      r.addEventListener("change",function(){
-        document.getElementById("bagsInput").style.display="none";
-        document.getElementById("blanketsInput").style.display="none";
-        if(this.value==="كيس"){document.getElementById("bagsInput").style.display="block";}
-        if(this.value==="بطانيات"){document.getElementById("blanketsInput").style.display="block";}
-      });
+      r.addEventListener("change",()=>{document.getElementById("bagsInput").style.display=r.value==="كيس"?"block":"none";});
     });
-  </script>
 
-  <!-- Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBopfLBoVC5MNVZoushjkULIbpSSz6blXw",
-      authDomain: "laundry-myx.firebaseapp.com",
-      projectId: "laundry-myx",
-      storageBucket: "laundry-myx.firebasestorage.app",
-      messagingSenderId: "555843818317",
-      appId: "1:555843818317:web:f7c15109e178ef6a7b1d04",
-      measurementId: "G-3MH16DF42H"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // حفظ الطلب
-    document.getElementById("orderForm").addEventListener("submit", async (e) => {
+    // حفظ الطلب في Firebase
+    document.getElementById("orderForm").addEventListener("submit",async e=>{
       e.preventDefault();
       document.getElementById("errMsg").style.display="none";
-
       const name=document.getElementById("custName").value.trim();
       const phone=document.getElementById("phone").value.trim();
       const address=document.getElementById("address").value.trim();
-      const pickup=pickupSelect.value;
-      const delivery=deliverySlot.value;
       const lat=document.getElementById("lat").value;
       const lng=document.getElementById("lng").value;
+      const pickup=pickupSelect.value;
+      const delivery=deliverySlot.value;
       const serviceType=document.querySelector('input[name="serviceType"]:checked')?.value;
       const bags=document.getElementById("bagsCount").value;
-      const blankets=document.getElementById("blanketsCount").value;
-
-      if(!name||!phone||!pickup||!serviceType){
-        document.getElementById("errMsg").style.display="block";return;
+      if(!name||!phone||!pickup||!serviceType||(serviceType==="كيس"&&!bags)){
+        document.getElementById("errMsg").style.display="block";
+        return;
       }
-      if(serviceType==="كيس" && !bags){
-        document.getElementById("errMsg").style.display="block";return;
-      }
-      if(serviceType==="بطانيات" && !blankets){
-        document.getElementById("errMsg").style.display="block";return;
-      }
-
-      try {
-        await addDoc(collection(db, "orders"), {
-          name, phone, address, pickup, delivery, lat, lng, serviceType,
-          bags: bags||null,
-          blankets: blankets||null,
-          createdAt: new Date().toISOString()
-        });
-
-        document.getElementById("successModal").style.display="flex";
+      try{
+        const{initializeApp}=await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js");
+        const{getFirestore,collection,addDoc}=await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js");
+        const firebaseConfig={apiKey:"AIzaSyBopfLBoVC5MNVZoushjkULIbpSSz6blXw",authDomain:"laundry-myx.firebaseapp.com",projectId:"laundry-myx",storageBucket:"laundry-myx.firebasestorage.app",messagingSenderId:"555843818317",appId:"1:555843818317:web:f7c15109e178ef6a7b1d04",measurementId:"G-3MH16DF42H"};
+        const app=initializeApp(firebaseConfig);
+        const db=getFirestore(app);
+        await addDoc(collection(db,"orders"),{name,phone,address,pickup,delivery,lat,lng,serviceType,bags:bags||null,createdAt:new Date().toISOString()});
+        alert("✅ تم إرسال طلبك بنجاح، سيتم التواصل معك قريبًا.");
         e.target.reset();
-      } catch(err) {
-        console.error("Firestore Error:", err);
+        fillSlots();
+      }catch(err){
+        console.error("Firestore Error:",err);
         document.getElementById("errMsg").style.display="block";
       }
     });
