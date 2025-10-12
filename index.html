@@ -63,6 +63,40 @@
   width: 26px;
   height: 26px;
 }
+/* يحافظ على مسافات مريحة بين كل حقل */
+form {
+  display: grid;
+  gap: 18px; /* ← المسافة العمودية بين كل مربع */
+}
+
+/* كل ديف داخلي يحتوي على label و input */
+form > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* ← مسافة بسيطة بين العنوان والمربع نفسه */
+}
+
+/* يجعل الحقول بنفس العرض */
+form input, form select {
+  width: 100%;
+  box-sizing: border-box;
+}
+.field-error {
+  display: none;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 13px;
+  margin-top: 6px;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 
   </style>
 </head>
@@ -125,7 +159,16 @@
       <h3>إرسال طلبك للمندوب</h3>
       <form id="orderForm" novalidate>
         <div><label>الاسم الكامل</label><input id="custName" required placeholder="اكتب اسمك"/></div>
-        <div><label>رقم الجوال</label><input id="phone" type="tel" required pattern="^05[0-9]{8}$" placeholder="05XXXXXXXX"/></div>
+    <div style="position: relative;">
+  <label>رقم الجوال</label>
+  <input id="phone" type="text" required
+         inputmode="numeric"
+         oninput="validatePhone(this)"
+         placeholder="05XXXXXXXX"
+         title="يجب أن يبدأ بـ 05 ويتكون من 10 أرقام" />
+  <small id="phoneError" class="field-error">❌ رقم الجوال غير صحيح.</small>
+</div>
+
         <div><label>العنوان</label><input id="address" value="جدة - الحمدانية" readonly style="background:#f1f5f9;color:#475569"/></div>
 
         <div><label>تاريخ الاستلام</label><select id="pickupDate" required></select></div>
@@ -318,6 +361,12 @@ document.getElementById("locateBtn").onclick = function () {
       document.getElementById("errMsg").style.display="none";
       const name=document.getElementById("custName").value.trim();
       const phone=document.getElementById("phone").value.trim();
+  // ✅ تحقق من رقم الجوال قبل الإرسال
+if (!/^05\d{8}$/.test(phone)) {
+  document.getElementById("phoneError").style.display = "block"; // ← نعرض الرسالة الحمراء
+  return; // ← نوقف الإرسال
+}
+
       const address=document.getElementById("address").value.trim();
       const lat=document.getElementById("lat").value;
       const lng=document.getElementById("lng").value;
@@ -356,11 +405,20 @@ document.body.appendChild(successMsg);
 setTimeout(() => successMsg.remove(), 3000);
         e.target.reset();
         fillSlots();
-      }catch(err){
+           }catch(err){
         console.error("Firestore Error:",err);
         document.getElementById("errMsg").style.display="block";
       }
     });
+
+    // ✅ دالة التحقق من رقم الجوال
+    function validatePhone(input){
+      const value = input.value.replace(/[^0-9]/g,'').slice(0,10);
+      input.value = value;
+      const valid = /^05\d{8}$/.test(value);
+      document.getElementById("phoneError").style.display = valid ? "none" : "block";
+    }
+
   </script>
 </body>
 </html>
