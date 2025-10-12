@@ -336,7 +336,24 @@ document.getElementById("locateBtn").onclick = function () {
         const app=initializeApp(firebaseConfig);
         const db=getFirestore(app);
         await addDoc(collection(db,"orders"),{name,phone,address,pickup,delivery,lat,lng,serviceType,bags:bags||null,createdAt:new Date().toISOString()});
-        alert("✅ تم إرسال طلبك بنجاح، سيتم التواصل معك قريبًا.");
+// إظهار رسالة نجاح بشكل أنيق داخل الصفحة
+const successMsg = document.createElement("div");
+successMsg.innerHTML = "✅ تم إرسال طلبك بنجاح، سيتم التواصل معك قريبًا.";
+successMsg.style.position = "fixed";
+successMsg.style.top = "20px";
+successMsg.style.left = "50%";
+successMsg.style.transform = "translateX(-50%)";
+successMsg.style.background = "#0ea5a6";
+successMsg.style.color = "#fff";
+successMsg.style.padding = "14px 24px";
+successMsg.style.borderRadius = "12px";
+successMsg.style.fontWeight = "700";
+successMsg.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+successMsg.style.zIndex = "9999";
+document.body.appendChild(successMsg);
+
+// إخفاؤها بعد 3 ثوانٍ
+setTimeout(() => successMsg.remove(), 3000);
         e.target.reset();
         fillSlots();
       }catch(err){
