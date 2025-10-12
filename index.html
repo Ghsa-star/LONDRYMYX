@@ -87,22 +87,27 @@
       <h3>خدماتنا</h3>
       <div class="grid">
         <article class="card">
-          <div class="svc">
-            <div>
-              <h4>غسيل كيس كامل</h4>
-              <span class="price">50 ريال</span>
-            </div>
-            <img src="images/bag.png" alt="كيس غسيل">
-          </div>
-          <label><input type="radio" name="serviceType" value="كيس"> اختر الخدمة</label>
-          <div id="bagsInput" style="display:none;margin-top:8px;">
-            <label>عدد الأكياس</label>
-            <select id="bagsCount">
-              <option value="">-- اختر --</option>
-              <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-            </select>
-          </div>
-        </article>
+  <div class="svc" style="align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <input type="radio" name="serviceType" value="كيس" style="width:20px;height:20px;cursor:pointer;">
+      <div>
+        <h4 style="margin:1;">غسيل كيس كامل</h4>
+        <span class="price">50 ريال</span>
+      </div>
+    </div>
+
+    <img src="images/bag.png" alt="كيس غسيل" style="width:90px;height:90px;border-radius:12px;object-fit:cover;">
+  </div>
+
+  <div id="bagsInput" style="display:none;margin-top:8px;">
+    <label>عدد الأكياس</label>
+    <select id="bagsCount">
+      <option value="">-- اختر --</option>
+      <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+    </select>
+  </div>
+</article>
+
 
         <article class="card" style="opacity:0.6;pointer-events:none;">
           <div class="svc">
