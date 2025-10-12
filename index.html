@@ -127,6 +127,7 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <script>
+    // تحميل الهيدر والفوتر
     async function includeFragment(targetSelector,url){
       const host=document.querySelector(targetSelector);
       if(!host)return;
@@ -136,52 +137,79 @@
     includeFragment('#header','header.html');
     includeFragment('#footer','footer.html');
 
-    // خريطة
-    const defaultPos=[21.707,39.190];
-    const map=L.map('map').setView(defaultPos,14);
+    // ✅ إعداد خريطة حي الحمدانية بدقة
+    const defaultPos=[21.7558,39.2014];
+    const map=L.map('map').setView(defaultPos,15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
     const marker=L.marker(defaultPos,{draggable:true}).addTo(map);
-    function updateInputs(lat,lng){document.getElementById("lat").value=lat.toFixed(6);document.getElementById("lng").value=lng.toFixed(6);}
-    updateInputs(defaultPos[0],defaultPos[1]);
-    marker.on("dragend",()=>updateInputs(marker.getLatLng().lat,marker.getLatLng().lng));
 
-    // ✅ التحقق من الحي وإظهار الاسم
-    map.on("click", e => {
-      const lat = e.latlng.lat;
-      const lng = e.latlng.lng;
+    // دائرة تبين حدود الحمدانية
+    const areaCircle=L.circle(defaultPos,{
+      radius:2000,
+      color:"#0ea5a6",
+      fillColor:"#0ea5a6",
+      fillOpacity:0.12
+    }).addTo(map);
 
-      // حدود الحي الحمدانية (تقريبية)
-      const inArea = lat > 21.690 && lat < 21.725 && lng > 39.175 && lng < 39.205;
+    // نطاق الحي الحقيقي
+    const bounds={minLat:21.740,maxLat:21.770,minLng:39.185,maxLng:39.220};
 
-      if (!inArea) {
-        alert("❌ الموقع خارج نطاق حي الحمدانية، الرجاء اختيار موقع داخل الحي.");
+    function isInHamdania(lat,lng){
+      return lat>bounds.minLat&&lat<bounds.maxLat&&lng>bounds.minLng&&lng<bounds.maxLng;
+    }
+
+    function updateInputs(lat,lng){
+      document.getElementById("lat").value=lat.toFixed(6);
+      document.getElementById("lng").value=lng.toFixed(6);
+    }
+
+    function resetToDefault(){
+      marker.setLatLng(defaultPos);
+      map.setView(defaultPos,15);
+      updateInputs(defaultPos[0],defaultPos[1]);
+    }
+
+    // منع التحديد خارج الحي
+    map.on("click",async e=>{
+      const{lat,lng}=e.latlng;
+      if(!isInHamdania(lat,lng)){
+        alert("❌ الموقع خارج نطاق حي الحمدانية.");
         return;
       }
-
       marker.setLatLng(e.latlng);
-      updateInputs(lat, lng);
+      updateInputs(lat,lng);
+      const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,{headers:{"Accept-Language":"ar"}});
+      const data=await res.json();
+      const area=data.address?.suburb||data.address?.neighbourhood||"حي غير معروف";
+      alert("📍 تم تحديد موقعك داخل: "+area);
+    });
 
-      // إظهار اسم الحي
-      fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
-        .then(res => res.json())
-        .then(data => {
-          const area = data.address.suburb || data.address.neighbourhood || "حي غير معروف";
-          alert("📍 تم تحديد موقعك داخل: " + area);
-        });
+    marker.on("dragend",()=>{
+      const {lat,lng}=marker.getLatLng();
+      if(!isInHamdania(lat,lng)){
+        alert("❌ الموقع خارج نطاق حي الحمدانية.");
+        resetToDefault();
+      } else updateInputs(lat,lng);
     });
 
     document.getElementById("locateBtn").onclick=function(){
       if(navigator.geolocation){
         navigator.geolocation.getCurrentPosition(p=>{
-          const pos=[p.coords.latitude,p.coords.longitude];
-          map.setView(pos,16);
-          marker.setLatLng(pos);
-          updateInputs(pos[0],pos[1]);
+          const lat=p.coords.latitude,lng=p.coords.longitude;
+          if(!isInHamdania(lat,lng)){
+            alert("❌ موقعك الحالي خارج نطاق حي الحمدانية.");
+            resetToDefault();
+            return;
+          }
+          map.setView([lat,lng],16);
+          marker.setLatLng([lat,lng]);
+          updateInputs(lat,lng);
+          alert("📍 تم تحديد موقعك داخل الحمدانية بنجاح.");
         });
-      }
+      }else alert("⚠️ المتصفح لا يدعم تحديد الموقع الجغرافي.");
     };
 
-    // قائمة الأيام
+    // ✅ إنشاء قائمة الأيام
     const pickupSelect=document.getElementById("pickupDate");
     const today=new Date();
     const days=["اليوم","غداً"];
@@ -195,7 +223,7 @@
       pickupSelect.appendChild(opt);
     }
 
-    // فترات الوقت
+    // ✅ فترات الوقت
     const slots=[
       {start:8,end:10,label:"8:00 ص - 10:00 ص"},
       {start:10,end:12,label:"10:00 ص - 12:00 م"},
@@ -235,10 +263,12 @@
     fillSlots();
     pickupSelect.addEventListener("change",fillSlots);
 
+    // ✅ اختيار الخدمة وعدد الأكياس
     document.querySelectorAll('input[name="serviceType"]').forEach(r=>{
       r.addEventListener("change",()=>{document.getElementById("bagsInput").style.display=r.value==="كيس"?"block":"none";});
     });
 
+    // ✅ إرسال الطلب
     document.getElementById("orderForm").addEventListener("submit",async e=>{
       e.preventDefault();
       document.getElementById("errMsg").style.display="none";
@@ -251,7 +281,9 @@
       const delivery=deliverySlot.value;
       const serviceType=document.querySelector('input[name="serviceType"]:checked')?.value;
       const bags=document.getElementById("bagsCount").value;
-      if(!name||!phone||!pickup||!serviceType||(serviceType==="كيس"&&!bags)){document.getElementById("errMsg").style.display="block";return;}
+      if(!name||!phone||!pickup||!serviceType||(serviceType==="كيس"&&!bags)){
+        document.getElementById("errMsg").style.display="block";return;
+      }
 
       try{
         const{initializeApp}=await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js");
